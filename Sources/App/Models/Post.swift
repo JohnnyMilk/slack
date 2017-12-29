@@ -2,23 +2,42 @@ import Vapor
 import FluentProvider
 import HTTP
 
+//Slack Structure
+//token=cm6zhoAdx6REx0jqA0agfqQQ
+//team_id=T0001
+//team_domain=example
+//channel_id=C2147483705
+//channel_name=test
+//timestamp=1355517523.000005
+//user_id=U2147483697
+//user_name=Steve
+//text=googlebot: What is the air-speed velocity of an unladen swallow?
+//trigger_word=googlebot:
+
+
 final class Post: Model {
     let storage = Storage()
     
     // MARK: Properties and database keys
     
     /// The content of the post
-    var content: String
+    var userID: String
+    var userName: String
+    var text: String
     
     /// The column names for `id` and `content` in the database
     struct Keys {
         static let id = "id"
-        static let content = "content"
+        static let userID = "user_id"
+        static let userName = "user_name"
+        static let text = "text"
     }
 
     /// Creates a new Post
-    init(content: String) {
-        self.content = content
+    init(userID: String, userName: String, text: String) {
+        self.userID = userID
+        self.userName = userName
+        self.text = text
     }
 
     // MARK: Fluent Serialization
@@ -26,13 +45,17 @@ final class Post: Model {
     /// Initializes the Post from the
     /// database row
     init(row: Row) throws {
-        content = try row.get(Post.Keys.content)
+        userID = try row.get(Post.Keys.userID)
+        userName = try row.get(Post.Keys.userName)
+        text = try row.get(Post.Keys.text)
     }
 
     // Serializes the Post to the database
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set(Post.Keys.content, content)
+        try row.set(Post.Keys.userID, userID)
+        try row.set(Post.Keys.userName, userName)
+        try row.set(Post.Keys.text, text)
         return row
     }
 }
@@ -45,7 +68,9 @@ extension Post: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
-            builder.string(Post.Keys.content)
+            builder.string(Post.Keys.userID)
+            builder.string(Post.Keys.userName)
+            builder.string(Post.Keys.text)
         }
     }
 
@@ -65,14 +90,18 @@ extension Post: Preparation {
 extension Post: JSONConvertible {
     convenience init(json: JSON) throws {
         self.init(
-            content: try json.get(Post.Keys.content)
+            userID: try json.get(Post.Keys.userID),
+            userName: try json.get(Post.Keys.userName),
+            text: try json.get(Post.Keys.text)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
         try json.set(Post.Keys.id, id)
-        try json.set(Post.Keys.content, content)
+        try json.set(Post.Keys.userID, userID)
+        try json.set(Post.Keys.userName, userName)
+        try json.set(Post.Keys.text, text)
         return json
     }
 }
@@ -94,8 +123,16 @@ extension Post: Updateable {
         return [
             // If the request contains a String at key "content"
             // the setter callback will be called.
-            UpdateableKey(Post.Keys.content, String.self) { post, content in
-                post.content = content
+            UpdateableKey(Post.Keys.text, String.self) { post, text in
+                post.text = text
+            },
+            
+            UpdateableKey(Post.Keys.userName, String.self) { post, userName in
+                post.userName = userName
+            },
+            
+            UpdateableKey(Post.Keys.userID, String.self) { post, userID in
+                post.userID = userID
             }
         ]
     }

@@ -59,7 +59,7 @@ final class PostController: ResourceRepresentable {
 
         // Update the post with all of the properties from
         // the new post
-        post.content = new.content
+        post.text = new.text
         try post.save()
 
         // Return the updated post
