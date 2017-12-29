@@ -13,11 +13,15 @@ final class PostController: ResourceRepresentable {
     /// When consumers call 'POST' on '/posts' with valid JSON
     /// construct and save the post
     func store(_ req: Request) throws -> ResponseRepresentable {
-        let post = try req.post()
-        try post.save()
-        return post
+        var json = JSON()
+        try json.set("user_id", "")
+        try json.set("user_name", req.storage)
+        try json.set("text", req.description)
+        return try Post.init(json: json)
+//        let post = try req.post()
+//        try post.save()
+//        return post
     }
-
     /// When the consumer calls 'GET' on a specific resource, ie:
     /// '/posts/13rd88' we should show that specific post
     func show(_ req: Request, post: Post) throws -> ResponseRepresentable {
