@@ -12,30 +12,24 @@ final class PostController: ResourceRepresentable {
 
     /// When consumers call 'POST' on '/posts' with valid JSON
     /// construct and save the post
-    func store(_ req: Request) throws -> ResponseRepresentable {
-        let formData = req.formURLEncoded
-        
-        // [String:Field]? from multipart/form-data
-        let multipartFormData = req.formData
-        
-        // [Part]? from multipart/mixed
-        let multipartMixedData = req.multipart
-        
-        
+    func store(_ req: Request) throws -> ResponseRepresentable {        
         var json = JSON()
         guard let user_id = req.data["user_id"]?.string else { throw Abort(.badRequest) }
         guard let user_name = req.data["user_name"]?.string else { throw Abort(.badRequest) }
         guard let text = req.data["text"]?.string else { throw Abort(.badRequest) }
         
-        try json.set("user_id", "\(user_id)")
-        try json.set("user_name", "\(user_name)")
-        try json.set("text", "\(text)")
-        let post = try Post.init(json: json)
-        try post.save()
-        return post
-//        let post = try req.post()
-//        try post.save()
-//        return post
+        if user_name == "slackbot" {
+            try json.set("text", "")
+            return json
+        } else {
+            try json.set("user_id", "\(user_id)")
+            try json.set("user_name", "\(user_name)")
+            try json.set("text", "\(text)")
+            let post = try Post.init(json: json)
+            try post.save()
+            return post
+        }
+
     }
     /// When the consumer calls 'GET' on a specific resource, ie:
     /// '/posts/13rd88' we should show that specific post
