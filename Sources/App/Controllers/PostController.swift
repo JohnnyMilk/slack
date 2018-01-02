@@ -24,7 +24,7 @@ final class PostController: ResourceRepresentable {
         } else {
             try json.set("user_id", "\(user_id)")
             try json.set("user_name", "\(user_name)")
-            try json.set("text", " @\(user_name)  \(text)")
+            try json.set("text", "<@"+user_id.string+">" + " \(text)")
             let post = try Post.init(json: json)
             try post.save()
             return post
