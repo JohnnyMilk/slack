@@ -12,7 +12,7 @@ final class PostController: ResourceRepresentable {
 
     /// When consumers call 'POST' on '/posts' with valid JSON
     /// construct and save the post
-    func store(_ req: Request) throws -> ResponseRepresentable {        
+    func store(_ req: Request) throws -> ResponseRepresentable {
         var json = JSON()
         guard let user_id = req.data["user_id"]?.string else { throw Abort(.badRequest) }
         guard let user_name = req.data["user_name"]?.string else { throw Abort(.badRequest) }
@@ -24,7 +24,7 @@ final class PostController: ResourceRepresentable {
         } else {
             try json.set("user_id", "\(user_id)")
             try json.set("user_name", "\(user_name)")
-            try json.set("text", "\(text)")
+            try json.set("text", "@\(user_id)  \(text)")
             let post = try Post.init(json: json)
             try post.save()
             return post
