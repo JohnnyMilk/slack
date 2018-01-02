@@ -23,9 +23,13 @@ final class PostController: ResourceRepresentable {
         
         
         var json = JSON()
-        try json.set("user_id", "\(formData)")
-        try json.set("user_name", "\(multipartFormData)")
-        try json.set("text", "\(multipartMixedData)")
+        guard let user_id = req.data["user_id"]?.string else { throw Abort(.badRequest) }
+        guard let user_name = req.data["user_name"]?.string else { throw Abort(.badRequest) }
+        guard let text = req.data["text"]?.string else { throw Abort(.badRequest) }
+        
+        try json.set("user_id", "\(user_id)")
+        try json.set("user_name", "\(user_name)")
+        try json.set("text", "\(text)")
         let post = try Post.init(json: json)
         try post.save()
         return post
